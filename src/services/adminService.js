@@ -1,5 +1,5 @@
 //const API_BASE_URL = 'https://localhost:7241/api';
-const API_BASE_URL='https://5sAuditapi.larcherp.com';
+const API_BASE_URL='https://5sAuditapi.larcherp.com/api';
 
 export const adminService = {
     // GET all users from AdminController
