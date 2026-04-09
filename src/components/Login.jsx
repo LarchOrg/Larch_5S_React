@@ -19,7 +19,7 @@ export default function Login({ onLogin, accentClass, accentColor }) {
       const data = await authService.login(credentials.email, credentials.password);
       
       // 2. On success, pass the role returned by the database to the App component
-      onLogin(data.role); 
+      onLogin(data); 
     } catch (err) {
       // 3. Handle errors (Invalid password, user not found, etc.)
       setError(err.message);
@@ -65,7 +65,7 @@ export default function Login({ onLogin, accentClass, accentColor }) {
               <input 
                 required
                 type="email"
-                placeholder="admin@larchqx.com"
+                placeholder="Enter your email"
                 className={inputStyle}
                 value={credentials.email}
                 onChange={(e) => setCredentials({...credentials, email: e.target.value})}
@@ -81,7 +81,7 @@ export default function Login({ onLogin, accentClass, accentColor }) {
               <input 
                 required
                 type="password"
-                placeholder="••••••••"
+                placeholder="Enter your password"
                 className={inputStyle}
                 value={credentials.password}
                 onChange={(e) => setCredentials({...credentials, password: e.target.value})}

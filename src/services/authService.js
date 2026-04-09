@@ -1,5 +1,6 @@
 //const API_BASE_URL = 'https://localhost:7241/api';
-const API_BASE_URL='https://5sAuditapi.larcherp.com/api';
+//const API_BASE_URL='https://5sAuditapi.larcherp.com/api';
+export const API_BASE_URL = 'https://5sAuditapi.larcherp.com/api' ;
 
 export const authService = {
   /**
@@ -24,6 +25,7 @@ export const authService = {
         localStorage.setItem('fsa_token', data.token);
         localStorage.setItem('fsa_role', data.role);
         localStorage.setItem('fsa_user_name', data.fullName);
+        localStorage.setItem('fsa_user_id', data.id);
       }
 
       return data;
@@ -40,10 +42,12 @@ export const authService = {
     localStorage.removeItem('fsa_token');
     localStorage.removeItem('fsa_role');
     localStorage.removeItem('fsa_user_name');
+    localStorage.removeItem('fsa_user_id');
   },
 
   getCurrentRole: () => localStorage.getItem('fsa_role'),
   getToken: () => localStorage.getItem('fsa_token'),
   getUserName: () => localStorage.getItem('fsa_user_name'),
+  getUserId: () => localStorage.getItem('fsa_user_id'),
   isAuthenticated: () => !!localStorage.getItem('fsa_token')
 };

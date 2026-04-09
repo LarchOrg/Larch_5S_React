@@ -39,7 +39,8 @@ export default function Layout({
   accent,
   setAccent,
   accentClass,
-  userRole
+  userRole,
+  userName
 }) {
   const [openSettings, setOpenSettings] = useState(false);
 
@@ -177,16 +178,16 @@ export default function Layout({
             <div className="flex items-center gap-3 pl-2">
               <div className="hidden md:block text-right">
                 <p className="text-sm font-extrabold leading-none capitalize tracking-tight">
-                  {userRole.replace('_', ' ')}
+                  {userName}
                 </p>
                 <p className="text-[10px] text-slate-500 mt-1 font-medium">
-                  {userRole === 'super_admin' ? 'System Proprietor' : 'Org Administrator'}
+                  {userRole.replace('_',' ')}
                 </p>
               </div>
               <div
                 className={`w-10 h-10 rounded-xl text-white flex items-center justify-center font-bold shadow-lg transition-colors duration-500 ${accentClass}`}
               >
-                {userRole === 'super_admin' ? 'SA' : userRole.charAt(0).toUpperCase()}
+                {userName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
               </div>
             </div>
 

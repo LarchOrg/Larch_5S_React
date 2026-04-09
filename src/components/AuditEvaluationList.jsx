@@ -1,19 +1,41 @@
 import React, { useState, useEffect } from "react";
-import { Search, ArrowRight, LayoutGrid, Eye, Award, CheckCircle2 } from 'lucide-react';
+import { Search, ArrowRight, LayoutGrid, Eye, Award } from 'lucide-react';
 import { adminService } from "../services/adminService";
 
-const AuditEvaluationList = ({ accentClass, onSelectAudit, onViewResults, userRole = "Auditor",accentColor }) => {
+const AuditEvaluationList = ({
+  accentClass,
+  onSelectAudit,
+  onViewResults,
+  userRole = "Auditor",
+  accentColor,
+  currentUserId // Receive the ID from App.jsx
+}) => {
   const [audits, setAudits] = useState([]);
   const [activeTab, setActiveTab] = useState("5S");
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const colorName = accentColor || 'blue';
+
   useEffect(() => {
     const fetchAudits = async () => {
       try {
         setLoading(true);
         const data = await adminService.getAuditList();
-        setAudits(data);
+
+        // --- ROLE BASED FILTERING ---
+        // If user is an Auditor, only show their assigned audits
+
+        if (userRole?.toLowerCase() === "auditor") {
+          // Ensure 'auditorId' matches the property name returned by your API
+          const myAudits = data.filter(audit =>
+            String(audit.auditorId) === String(currentUserId)
+          );
+          setAudits(myAudits);
+        } else {
+          // Admin, Super Admin, etc., see all audits
+          setAudits(data);
+        }
+        /*setAudits(data);*/
       } catch (err) {
         console.error("Error fetching audits:", err);
       } finally {
@@ -21,7 +43,7 @@ const AuditEvaluationList = ({ accentClass, onSelectAudit, onViewResults, userRo
       }
     };
     fetchAudits();
-  }, []);
+  }, [currentUserId, userRole]); // Re-run if user context changes
 
   const getStatusStyles = (status) => {
     switch (status) {
@@ -59,7 +81,7 @@ const AuditEvaluationList = ({ accentClass, onSelectAudit, onViewResults, userRo
             </div>
             <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
               Audit<span className={`text-${colorName}-600`}> Dashboard</span>
-              </h1>
+            </h1>
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
@@ -67,7 +89,7 @@ const AuditEvaluationList = ({ accentClass, onSelectAudit, onViewResults, userRo
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={16} />
               <input
                 type="text"
-                placeholder="Search by department or auditor..."
+                placeholder="Search audits..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 pl-10 pr-4 py-2.5 rounded-xl text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all dark:text-white"
@@ -127,7 +149,6 @@ const AuditEvaluationList = ({ accentClass, onSelectAudit, onViewResults, userRo
                       Auditor: {audit.auditor}
                     </p>
 
-                    {/* Score Display (Only if completed) */}
                     {isCompleted && (
                       <div className="flex items-center gap-4 mb-6 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed dark:border-slate-700">
                         <div className="flex flex-col">
@@ -144,7 +165,6 @@ const AuditEvaluationList = ({ accentClass, onSelectAudit, onViewResults, userRo
                   </div>
 
                   <div className="space-y-4">
-                    {/* Progress Bar */}
                     <div className="relative h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                       <div
                         className={`absolute top-0 left-0 h-full transition-all duration-1000 ${isCompleted ? 'bg-emerald-500' : accentClass}`}
@@ -162,7 +182,6 @@ const AuditEvaluationList = ({ accentClass, onSelectAudit, onViewResults, userRo
                         </span>
                       </div>
 
-                      {/* Action Buttons */}
                       {isAuditor && !isCompleted ? (
                         <button
                           onClick={async () => {
@@ -172,8 +191,7 @@ const AuditEvaluationList = ({ accentClass, onSelectAudit, onViewResults, userRo
                               console.error("Status update failed", e);
                             }
                             onSelectAudit(audit)
-                          }
-                          }
+                          }}
                           className={`w-28 h-10 rounded-xl text-white flex items-center justify-center gap-2 hover:translate-x-1 transition-all shadow-lg text-[10px] font-black uppercase tracking-tighter ${accentClass}`}
                         >
                           {audit.status === 'In Progress' ? 'Resume' : 'Start'} <ArrowRight size={14} strokeWidth={3} />
@@ -181,9 +199,12 @@ const AuditEvaluationList = ({ accentClass, onSelectAudit, onViewResults, userRo
                       ) : (
                         <button
                           onClick={() => onViewResults(audit)}
+                          disabled={audit.status !== 'Completed'}
                           className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${isCompleted
                             ? 'bg-emerald-50 border-emerald-100 text-emerald-600 hover:bg-emerald-100'
-                            : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'
+                            : audit.status !== 'Completed'
+                              ? 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed opacity-60'
+                              : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100'
                             }`}
                         >
                           {isCompleted ? <Award size={14} /> : <Eye size={14} />}

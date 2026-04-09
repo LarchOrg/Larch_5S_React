@@ -1,5 +1,6 @@
+import {API_BASE_URL} from "./authService";
 //const API_BASE_URL = 'https://localhost:7241/api';
-const API_BASE_URL='https://5sAuditapi.larcherp.com/api';
+//const API_BASE_URL='https://5sAuditapi.larcherp.com/api';
 
 export const adminService = {
     // GET all users from AdminController
@@ -33,7 +34,7 @@ export const adminService = {
 
     // Edit user
     updateUser: async (id, data) => {
-        const response = await fetch(`${API_URL}/Admin/FsaUsers/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/Admin/FsaUsers/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

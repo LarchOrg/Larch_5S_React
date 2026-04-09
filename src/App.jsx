@@ -30,6 +30,8 @@ export default function App() {
   // --- AUTH STATE (Persistent) ---
   const [isLoggedIn, setIsLoggedIn] = useState(() => authService.isAuthenticated());
   const [userRole, setUserRole] = useState(() => authService.getCurrentRole());
+  const [userName, setUserName] = useState(() => authService.getUserName() || 'Guest User');
+  const [userId, setUserId] = useState(() => authService.getUserId());
 
   // --- ROUTER LOGIC ---
   const [view, setView] = useState(() => {
@@ -94,8 +96,10 @@ export default function App() {
   }, [isDark]);
 
   // --- HANDLERS ---
-  const handleLogin = (selectedRole) => {
-    setUserRole(selectedRole);
+  const handleLogin = (data) => {
+    setUserId(data.id || data.userId);
+    setUserRole(data.role);
+    setUserName(data.fullName || data.userName || 'User');
     setIsLoggedIn(true);
     setView('dashboard');
   };
@@ -170,6 +174,7 @@ export default function App() {
             onSelectAudit={handleStartAudit}
             onViewResults={handleViewResults}
             userRole={userRole}
+            currentUserId={userId}
           />
         );
 
@@ -289,6 +294,7 @@ export default function App() {
       currentView={view}
       setView={setView}
       onLogout={handleLogout}
+      userName={userName}
       userRole={userRole}
       accent={accent}
       setAccent={setAccent}

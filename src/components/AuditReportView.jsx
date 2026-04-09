@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ClipboardCheck, MessageSquare, ImageIcon, Award ,Eye} from 'lucide-react';
+import { ChevronLeft, ClipboardCheck, MessageSquare, ImageIcon, Award, Eye, X } from 'lucide-react'; // Added X for close
 import { adminService } from '../services/adminService';
+import { API_BASE_URL } from '../services/authService';
+
 
 const AuditReportView = ({ audit, accentClass, onBack }) => {
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    // State to handle the modal popup
+    const [selectedImg, setSelectedImg] = useState(null);
+    const FILE_BASE_URL= `${API_BASE_URL.replace('/api', '')}`;
+    
     useEffect(() => {
         const fetchResults = async () => {
             try {
@@ -30,7 +35,30 @@ const AuditReportView = ({ audit, accentClass, onBack }) => {
     }
 
     return (
-        <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900">
+        <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900 relative">
+            {/* --- IMAGE POPUP MODAL --- */}
+            {selectedImg && (
+                <div 
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+                    onClick={() => setSelectedImg(null)}
+                >
+                    <div className="relative max-w-4xl w-full flex flex-col items-center">
+                        <button 
+                            className="absolute -top-12 right-0 p-2 text-white hover:bg-white/20 rounded-full transition-colors"
+                            onClick={() => setSelectedImg(null)}
+                        >
+                            <X size={32} />
+                        </button>
+                        <img 
+                            src={`${FILE_BASE_URL}${selectedImg}`} 
+                            alt="Evidence Large" 
+                            className="max-h-[85vh] w-auto rounded-2xl shadow-2xl border-4 border-white/10"
+                            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking image
+                        />
+                    </div>
+                </div>
+            )}
+
             {/* Header */}
             <div className="bg-white dark:bg-slate-800 border-b dark:border-slate-700 p-4 flex items-center gap-4">
                 <button onClick={onBack} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors">
@@ -115,22 +143,20 @@ const AuditReportView = ({ audit, accentClass, onBack }) => {
                                         </p>
                                         <div className="flex flex-wrap gap-3">
                                             {item.imageUrls.map((url, i) => (
-                                                <a 
+                                                <button 
                                                     key={i} 
-                                                    href={`https://localhost:7241${url}`} 
-                                                    target="_blank" 
-                                                    rel="noreferrer"
+                                                    onClick={() => setSelectedImg(url)} // Open Popup
                                                     className="group relative w-24 h-24 rounded-2xl overflow-hidden border-2 border-white dark:border-slate-700 shadow-md hover:scale-105 transition-transform"
                                                 >
                                                     <img 
-                                                        src={`https://localhost:7241${url}`} 
+                                                        src={`${FILE_BASE_URL}${url}`} 
                                                         alt="evidence" 
                                                         className="w-full h-full object-cover"
                                                     />
                                                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                                                         <Eye className="text-white" size={20} />
                                                     </div>
-                                                </a>
+                                                </button>
                                             ))}
                                         </div>
                                     </div>

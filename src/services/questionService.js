@@ -1,5 +1,6 @@
+import {API_BASE_URL} from "./authService";
 //const API_BASE_URL = 'https://localhost:7241/api';
-const API_BASE_URL='https://5sAuditapi.larcherp.com/api';
+//const API_BASE_URL='https://5sAuditapi.larcherp.com/api';
 
 export const questionService = {
     getAll: async () => {
